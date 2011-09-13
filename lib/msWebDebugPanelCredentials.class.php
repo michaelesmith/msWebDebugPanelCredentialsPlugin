@@ -30,6 +30,7 @@ class msWebDebugPanelCredentials extends sfWebDebugPanel {
 
 		// preprend our routes
 		$r->prependRoute('msWebDebugPanelCredentials', new sfRoute('/msWebDebugPanelCredentials/:type/:subject', array('module' => 'msWebDebugPanelCredentials', 'action' => 'index')));
+		$r->prependRoute('msWebDebugPanelCredentialsMasquerade', new sfRoute('/msWebDebugPanelCredentials/masquerade', array('module' => 'msWebDebugPanelCredentials', 'action' => 'masquerade')));
 	}
 
 	public function getTitle() {
@@ -52,6 +53,11 @@ class msWebDebugPanelCredentials extends sfWebDebugPanel {
 
 		$user_html = sprintf('<h2>Currently logged in as %s - ', $user->getGuardUser()->getUsername());
 		$user_html .= $user->getGuardUser()->getIsSuperAdmin() ? 'Notice: This user has super admin and will have all credentials no matter what is choosen here</h2>' : 'Super admin is off</h2>';
+
+		$masquerade_html = '<h2>Masquerade Users</h2><a href="' . $routing->generate('msWebDebugPanelCredentialsMasquerade') . '">Select</a>';
+		foreach($user->getAttribute('msWebDebugPanelCredentials.masquerade', array()) as $masquerade_id => $masquerade_user){
+			$masquerade_html .= sprintf(' <a href="%s">%s</a>', $routing->generate('msWebDebugPanelCredentialsMasquerade', array('user_id' => $masquerade_id)), $masquerade_user);
+		}
 
 		$delete = sprintf('<h2>Current Credentials</h2>Clicking will remove<ul><li><a href="%s"><img src="/msWebDebugPanelCredentialsPlugin/images/cross.png" />Remove All</a></li>',
 							 $routing->generate('msWebDebugPanelCredentials', array('type' => 'credential', 'subject' => 'all'))
@@ -85,7 +91,7 @@ class msWebDebugPanelCredentials extends sfWebDebugPanel {
 
 		$group_html .= '</ul>';
 
-		return "<table><tr><td>$delete</td><td>$add</td><td>$group_html</td></tr></table>$user_html";
+		return "<table><tr><td>$delete</td><td>$add</td><td>$group_html</td></tr></table>$user_html $masquerade_html";
 	}
 
 }

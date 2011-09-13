@@ -35,4 +35,24 @@ class msWebDebugPanelCredentialsActions extends sfActions {
 		$this->redirect($request->getReferer());
 	}
 
+	public function executeMasquerade(sfWebRequest $request) {
+		if($request->hasParameter('user_id')){
+			$user = sfGuardUserTable::getInstance()->find($request->getParameter('user_id'));
+			$this->forward404Unless($user);
+
+			if($this->getUser()->hasAttribute('msWebDebugPanelCredentials.masquerade')){
+				$masquerade = $this->getUser()->getAttribute('msWebDebugPanelCredentials.masquerade');
+			}else{
+				$masquerade[$this->getUser()->getGuardUser()->id] = sprintf('%s (%s)', $this->getUser()->getGuardUser()->username, $this->getUser()->getGuardUser()->__toString());
+			}
+			$masquerade[$user->id] = sprintf('%s (%s)', $user->username, $user->__toString());
+			$this->getUser()->setAttribute('msWebDebugPanelCredentials.masquerade', $masquerade);
+
+			$this->getUser()->signOut();
+			$this->getUser()->signIn($user);
+		}
+
+		$this->users = sfGuardUserTable::getInstance()->createQuery('u')->orderBy('u.username')->execute();
+	}
+
 }
