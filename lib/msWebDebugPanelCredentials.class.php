@@ -50,6 +50,14 @@ class msWebDebugPanelCredentials extends sfWebDebugPanel {
 		if(!$user->isAuthenticated()){
 			return 'The current user is not authenticated';
 		}
+      
+      $edit_html = '';
+      if($routing->hasRouteName('sf_guard_permission')){
+         $edit_html .= sprintf('<a href="%s">Edit Permissions</a> ', $routing->generate('sf_guard_permission'));
+      }
+      if($routing->hasRouteName('sf_guard_group')){
+         $edit_html .= sprintf('<a href="%s">Edit Groups</a> ', $routing->generate('sf_guard_group'));
+      }
 
 		$user_html = sprintf('<h2>Currently logged in as %s - ', $user->getGuardUser()->getUsername());
 		$user_html .= $user->getGuardUser()->getIsSuperAdmin() ? 'Notice: This user has super admin and will have all credentials no matter what is choosen here</h2>' : 'Super admin is off</h2>';
@@ -91,7 +99,7 @@ class msWebDebugPanelCredentials extends sfWebDebugPanel {
 
 		$group_html .= '</ul>';
 
-		return "<table><tr><td>$delete</td><td>$add</td><td>$group_html</td></tr></table>$user_html $masquerade_html";
+		return "<table><tr><td>$delete</td><td>$add</td><td>$group_html</td></tr></table>$edit_html $user_html $masquerade_html";
 	}
 
 }
